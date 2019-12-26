@@ -1,6 +1,7 @@
 import pygame
 import game.settings as settings
-from game.sprites import Player, Platform
+from game.sprites import Player, Platform, Gun, vec
+from itertools import chain
 
 
 class Game(object):
@@ -22,8 +23,11 @@ class Game(object):
 
         # Create sprite groups
         self.players = pygame.sprite.Group()
-        self.all_sprites = pygame.sprite.Group()
+        self.guns = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
+        self.fallings = pygame.sprite.Group()
+        self.all_sprites = pygame.sprite.Group()
 
         # Add sprites to the groups
 
@@ -36,6 +40,13 @@ class Game(object):
             platform = Platform(*plat)
             self.all_sprites.add(platform)
             self.platforms.add(platform)
+
+        for g in settings.GUN_LIST:
+            gun = Gun(self, *g)
+            self.all_sprites.add(gun)
+            self.guns.add(gun)
+
+
 
         self.run()
 
@@ -61,17 +72,35 @@ class Game(object):
     def update(self):
         self.all_sprites.update()
 
-        # Platform collision
-        for player in self.players:
-            print(player.vel.y)
-            hits = pygame.sprite.spritecollide(player, self.platforms, False)
+        # Platform collision for players
+        for thing in chain(self.players, self.guns):
+            hits = pygame.sprite.spritecollide(thing, self.platforms, False)
+
             if hits:
                 for hit in hits:
-                    print(hit)
-                    player.pos.y = hit.rect.top
-                    player.vel.y = 0
-                    player.acc.y = 0
-                    player.jumping = False
+
+                    if thing.vel.y > 0:
+                        thing.pos.y = hit.rect.top
+                        thing.vel.y = 0
+                        thing.acc.y = 0
+                        thing.jumping = False
+
+
+        # Check if player can pickup a gun
+        for player in self.players:
+            player.pickupable = []
+            pickups = pygame.sprite.spritecollide(player, self.guns, False)
+            if pickups:
+                for pickup in pickups:
+                    player.pickupable.append(pickup)
+            hits = pygame.sprite.spritecollide(player, self.bullets, True)
+            if hits:
+                for bullet in hits:
+                    if player != bullet.shooter:
+                        player.eye.kill()
+                        player.kill()
+            #print(player.pickupable)
+
 
     def draw(self):
         self.screen.fill(self.white)
