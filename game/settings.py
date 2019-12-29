@@ -30,9 +30,9 @@ PLAYER_LIST = [(50, 50, (111, 50, 200),
                 [pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_e, pygame.K_q, pygame.K_r, pygame.K_f])]
 
 GUN_PISTOL = (30, 7)
-GUN_SNIPER = ((500, 20), 80, 5, 500, 35, 20, 5)
+GUN_SNIPER = (80, 5, 500, 35, 20, 5)
 GUN_ROCKET = ((250, 20), 80, 20, 1000, 10, 30, 15)
 
 # ORDER: Pos, *Gun
 GUN_LIST = [((50, 50), *GUN_PISTOL),
-            ((1000, 50) *GUN_PISTOL)]
+            ((1000, 50), *GUN_SNIPER)]

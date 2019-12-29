@@ -68,7 +68,9 @@ class Game(object):
                 self.quit()
             if event.type == pygame.QUIT:
                 self.quit()
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F1:
+                    g.new()
     def update(self):
         self.all_sprites.update()
 
@@ -98,6 +100,8 @@ class Game(object):
                 for bullet in hits:
                     if player != bullet.shooter:
                         player.eye.kill()
+                        if player.holding is not None:
+                            player.holding.locked = False
                         player.kill()
             #print(player.pickupable)
 
